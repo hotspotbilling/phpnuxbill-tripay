@@ -1,6 +1,6 @@
 # Payment gateway [Tripay](https://tripay.co.id/?ref=TP19304)
 
-payment gateway [Tripay](https://tripay.co.id/?ref=TP19304) untuk PHPMixBill
+payment gateway [Tripay](https://tripay.co.id/?ref=TP19304) untuk PHPNuxBill
 
 ## instalasi
 

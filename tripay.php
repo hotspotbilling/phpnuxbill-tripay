@@ -3,7 +3,7 @@
 
 
 /**
- * PHP Mikrotik Billing (https://ibnux.github.io/phpmixbill/)
+ * PHP Mikrotik Billing (https://github.com/hotspotbilling/phpnuxbill/)
  *
  * Payment Gateway tripay.com
  **/
@@ -20,7 +20,7 @@ function tripay_validate_config()
 function tripay_show_config()
 {
     global $ui, $config;
-    $ui->assign('_title', 'Tripay - Payment Gateway - ' . $config['CompanyName']);
+    $ui->assign('_title', 'Tripay - Payment Gateway');
     $ui->assign('channels', json_decode(file_get_contents('system/paymentgateway/channel_tripay.json'), true));
     $ui->display('tripay.tpl');
 }
@@ -83,7 +83,7 @@ function tripay_create_transaction($trx, $user)
     global $config, $routes, $ui;
     $channels = json_decode(file_get_contents('system/paymentgateway/channel_tripay.json'), true);
     if (!in_array($routes[4], explode(",", $config['tripay_channel']))) {
-        $ui->assign('_title', 'Tripay Channel - ' . $config['CompanyName']);
+        $ui->assign('_title', 'Tripay Channel');
         $ui->assign('channels', $channels);
         $ui->assign('tripay_channels', explode(",", $config['tripay_channel']));
         $ui->assign('path', $routes[2] . '/' . $routes[3]);
