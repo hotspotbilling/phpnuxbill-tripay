@@ -47,6 +47,7 @@
                         <pre>/ip hotspot walled-garden
 add dst-host=tripay.co.id
 add dst-host=*.tripay.co.id</pre>
+<small id="emailHelp" class="form-text text-muted">Set Telegram Bot to get any error and notification</small>
                 </div>
             </div>
 
