@@ -2,6 +2,8 @@
 
 payment gateway [Tripay](https://tripay.co.id/?ref=TP19304) untuk PHPNuxBill
 
+[Download](https://github.com/hotspotbilling/phpnuxbill-tripay/archive/refs/heads/master.zip)
+
 ## instalasi
 
 Copy **tripay.php** dan **channel_tripay.json** ke folder **system/paymentgateway/**
