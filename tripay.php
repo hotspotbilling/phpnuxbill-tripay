@@ -109,7 +109,7 @@ function tripay_create_transaction($trx, $user)
     $result = json_decode(Http::postJsonData(tripay_get_server() . 'transaction/create', $json, ['Authorization: Bearer ' . $config['tripay_api_key']]), true);
     if ($result['success'] != 1) {
         Message::sendTelegram("Tripay payment failed\n\n" . json_encode($result, JSON_PRETTY_PRINT));
-        r2(U . 'order/package', 'e', Lang::T("Failed to create transaction.\n".$resul['message']));
+        r2(U . 'order/package', 'e', Lang::T("Failed to create transaction.\n".$result['message']));
     }
     $d = ORM::for_table('tbl_payment_gateway')
         ->where('username', $user['username'])
