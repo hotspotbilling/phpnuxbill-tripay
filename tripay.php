@@ -160,6 +160,13 @@ function tripay_get_status($trx, $user)
     }
 }
 
+// callback
+function tripay_payment_notification()
+{
+    // ignore it, let user check it from payment page
+    die('OK');
+}
+
 function tripay_get_server()
 {
     global $_app_stage;
