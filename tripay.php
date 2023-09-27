@@ -11,7 +11,7 @@ function tripay_validate_config()
 {
     global $config;
     if (empty($config['tripay_secret_key'])) {
-        Message::sendTelegram("Tripay payment gateway not configured");
+        sendTelegram("Tripay payment gateway not configured");
         r2(U . 'order/package', 'w', Lang::T("Admin has not yet setup Tripay payment gateway, please tell admin"));
     }
 }
@@ -30,6 +30,7 @@ function tripay_save_config()
     $tripay_merchant = _post('tripay_merchant');
     $tripay_api_key = _post('tripay_api_key');
     $tripay_secret_key = _post('tripay_secret_key');
+    $tripay_view_payment = _post('tripay_view_payment');
     $d = ORM::for_table('tbl_appconfig')->where('setting', 'tripay_merchant')->find_one();
     if ($d) {
         $d->value = $tripay_merchant;
@@ -48,6 +49,17 @@ function tripay_save_config()
         $d = ORM::for_table('tbl_appconfig')->create();
         $d->setting = 'tripay_api_key';
         $d->value = $tripay_api_key;
+        $d->save();
+    }
+
+    $d = ORM::for_table('tbl_appconfig')->where('setting', 'tripay_view_payment')->find_one();
+    if ($d) {
+        $d->value = $tripay_view_payment;
+        $d->save();
+    } else {
+        $d = ORM::for_table('tbl_appconfig')->create();
+        $d->setting = 'tripay_view_payment';
+        $d->value = $tripay_view_payment;
         $d->save();
     }
     $d = ORM::for_table('tbl_appconfig')->where('setting', 'tripay_secret_key')->find_one();
@@ -108,20 +120,27 @@ function tripay_create_transaction($trx, $user)
     ];
     $result = json_decode(Http::postJsonData(tripay_get_server() . 'transaction/create', $json, ['Authorization: Bearer ' . $config['tripay_api_key']]), true);
     if ($result['success'] != 1) {
-        Message::sendTelegram("Tripay payment failed\n\n" . json_encode($result, JSON_PRETTY_PRINT));
-        r2(U . 'order/package', 'e', Lang::T("Failed to create transaction.\n".$result['message']));
+        sendTelegram("Tripay payment failed\n\n" . json_encode($result, JSON_PRETTY_PRINT));
+        r2(U . 'order/package', 'e', Lang::T("Failed to create transaction."));
     }
     $d = ORM::for_table('tbl_payment_gateway')
         ->where('username', $user['username'])
         ->where('status', 1)
         ->find_one();
     $d->gateway_trx_id = $result['data']['reference'];
-    $d->pg_url_payment = $result['data']['checkout_url'];
+    if ($config['tripay_view_payment'] == 'local') {
+        $d->pg_url_payment = U . 'plugin/tripay_show_payment&id=' . $d['id'];
+    } else {
+        $d->pg_url_payment = $result['data']['checkout_url'];
+    }
     $d->pg_request = json_encode($result);
     $d->expired_date = date('Y-m-d H:i:s', $result['data']['expired_time']);
     $d->save();
-    r2(U . "order/view/" . $d['id'], 's', Lang::T("Create Transaction Success"));
-
+    if ($config['tripay_view_payment'] == 'local') {
+        r2(U . "plugin/tripay_show_payment&id=" . $d['id'], 's', Lang::T("Create Transaction Success"));
+    } else {
+        r2(U . "order/view/" . $d['id'], 's', Lang::T("Create Transaction Success"));
+    }
 }
 
 function tripay_get_status($trx, $user)
@@ -131,7 +150,7 @@ function tripay_get_status($trx, $user)
         'Authorization: Bearer ' . $config['tripay_api_key']
     ]), true);
     if ($result['success'] != 1) {
-        Message::sendTelegram("Tripay payment status failed\n\n" . json_encode($result, JSON_PRETTY_PRINT));
+        sendTelegram("Tripay payment status failed\n\n" . json_encode($result, JSON_PRETTY_PRINT));
         r2(U . "order/view/" . $trx['id'], 'w', Lang::T("Payment check failed."));
     }
     $result =  $result['data'];
