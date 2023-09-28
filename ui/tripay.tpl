@@ -30,7 +30,7 @@
                     <div class="form-group">
                         <label class="col-md-2 control-label">View Payment</label>
                         <div class="col-md-6">
-                            <select name="disable_voucher" id="disable_voucher" class="form-control">
+                            <select name="tripay_view_payment" id="tripay_view_payment" class="form-control">
                                 <option value="tripay" {if $_c['tripay_view_payment'] == 'tripay'}selected="selected"
                                     {/if}>Tripay
                                 </option>
