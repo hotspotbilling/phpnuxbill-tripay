@@ -63,7 +63,7 @@
                     <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">
                             <button class="btn btn-primary waves-effect waves-light"
-                                type="submit">{$_L['Save']}</button>
+                                type="submit">{Lang::T('Save')}</button>
                             <a class="btn btn-info waves-effect waves-light" href="https://tripay.co.id/?ref=TP19304"
                                 target="_blank">Daftar Tripay</a>
                         </div>

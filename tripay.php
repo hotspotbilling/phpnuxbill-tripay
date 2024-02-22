@@ -83,9 +83,9 @@ function tripay_save_config()
         $d->save();
     }
 
-    _log('[' . $admin['username'] . ']: Tripay ' . $_L['Settings_Saved_Successfully'] . json_encode($_POST['tripay_channel']), 'Admin', $admin['id']);
+    _log('[' . $admin['username'] . ']: Tripay ' . Lang::T('Settings_Saved_Successfully') . json_encode($_POST['tripay_channel']), 'Admin', $admin['id']);
 
-    r2(U . 'paymentgateway/tripay', 's', $_L['Settings_Saved_Successfully']);
+    r2(U . 'paymentgateway/tripay', 's', Lang::T('Settings_Saved_Successfully'));
 }
 
 
