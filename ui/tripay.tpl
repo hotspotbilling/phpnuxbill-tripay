@@ -39,18 +39,17 @@
                                 </option>
                             </select>
                         </div>
-                        <p class="help-block col-md-4">Local akan menampilkan instruksi pembayaran di PHPNuxBill,
-                            pastikan anda menginstall Plugin Tripay</p>
+                        <p class="help-block col-md-4">{Lang::T('Local will display payment instructions in PHPNuxBill, make sure you install the Tripay Plugin')}</p>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-2 control-label">Notification URL</label>
+                        <label class="col-md-2 control-label">{Lang::T('Notification URL')}</label>
                         <div class="col-md-6">
                             <input type="text" readonly class="form-control" onclick="this.select()"
                                 value="{$_url}callback/tripay">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-2 control-label">Channels</label>
+                        <label class="col-md-2 control-label">{Lang::T('Channels')}</label>
                         <div class="col-md-6">
                             {foreach $channels as $channel}
                                 <label class="checkbox-inline"><input type="checkbox"
@@ -63,16 +62,16 @@
                     <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">
                             <button class="btn btn-primary waves-effect waves-light"
-                                type="submit">{Lang::T('Save')}</button>
+                                type="submit">{Lang::T('Save Change')}</button>
                             <a class="btn btn-info waves-effect waves-light" href="https://tripay.co.id/?ref=TP19304"
-                                target="_blank">Daftar Tripay</a>
+                                target="_blank">{Lang::T('Tripay Register')}</a>
                         </div>
                     </div>
                     <pre>/ip hotspot walled-garden
 add dst-host=tripay.co.id
 add dst-host=*.tripay.co.id</pre>
-                    <small id="emailHelp" class="form-text text-muted">Set Telegram Bot to get any error and
-                        notification</small>
+                    <small id="emailHelp" class="form-text text-muted">{Lang::T('Set Telegram Bot to get any error and
+                        notification')}</small>
                 </div>
             </div>
 
