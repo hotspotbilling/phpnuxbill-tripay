@@ -182,10 +182,71 @@ function tripay_get_status($trx, $user)
 // callback
 function tripay_payment_notification()
 {
-    // ignore it, let user check it from payment page
-    die('OK');
-}
+    global $config;
+    $data = file_get_contents('php://input');
+    header("Content-Type: application/json");
 
+    if (!empty($data)) {
+        $json = json_decode($data, true);
+        $msg = '';
+
+        if (!empty($json['reference'])) {
+            $trx = ORM::for_table('tbl_payment_gateway')
+                ->where('gateway_trx_id', $json['reference'])
+                ->find_one();
+
+            if ($trx) {
+                $user = ORM::for_table('tbl_customers')
+                    ->where('username', $trx['username'])
+                    ->find_one();
+
+                // Ambil status transaksi dari Tripay
+                $apiKey = $config['tripay_api_key'];
+                $endpoint = tripay_get_server() . "transaction/detail?reference=" . $json['reference'];
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $endpoint);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    "Authorization: Bearer $apiKey"
+                ]);
+
+                $response = curl_exec($ch);
+                curl_close($ch);
+
+                $result = json_decode($response, true);
+
+                if ($result && isset($result['data']['status']) && $result['data']['status'] == 'PAID' && $trx['status'] != 2) {
+                    if (Package::rechargeUser($user['id'], $trx['routers'], $trx['plan_id'], $trx['gateway'], $result['data']['payment_name'])) {
+                        $trx->pg_paid_response = json_encode($result);
+                        $trx->payment_method = $result['data']['payment_method'];
+                        $trx->payment_channel = $result['data']['payment_name'];
+                        $trx->paid_date = date('Y-m-d H:i:s', strtotime($result['data']['paid_at']));
+                        $trx->status = 2;
+                        $trx->save();
+                        $msg = 'Payment successful and package activated.';
+                    } else {
+                        Message::sendTelegram("tripay_payment_notification: Activation FAILED: \n\n" . json_encode($json, JSON_PRETTY_PRINT) . " \n\n" . json_encode($result, JSON_PRETTY_PRINT));
+                        $msg = 'Failed to activate package';
+                    }
+                } elseif (in_array($result['data']['status'], ['EXPIRED', 'FAILED', 'REFUND'])) {
+                    $trx->pg_paid_response = json_encode($result);
+                    $trx->status = 3; // Mark transaction as failed/expired
+                    $trx->save();
+                    $msg = 'Transaction expired or failed.';
+                } else {
+                    $msg = 'Transaction not paid or invalid response.';
+                }
+            } else {
+                $msg = 'Transaction not found.';
+            }
+        }
+
+        die(json_encode(['status' => $json['status'], 'reference' => $json['reference'], 'message' => $msg]));
+    } else {
+        die(json_encode(['status' => 'no data received']));
+    }
+}
 function tripay_get_server()
 {
     global $_app_stage;
